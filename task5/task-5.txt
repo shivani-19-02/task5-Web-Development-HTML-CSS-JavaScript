@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mini E-Commerce App</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+    }
+
+    header, footer {
+      background: #333;
+      color: white;
+      text-align: center;
+      padding: 1em;
+    }
+
+    nav {
+      display: flex;
+      justify-content: space-between;
+      background: #444;
+      padding: 1em;
+      color: white;
+    }
+
+    nav select {
+      padding: 0.5em;
+    }
+
+    .container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      padding: 20px;
+    }
+
+    .product {
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+
+    .product h3 {
+      margin: 0;
+    }
+
+    .product span {
+      font-size: 0.9em;
+      color: #555;
+    }
+
+    .product button {
+      margin-top: 10px;
+      padding: 10px;
+      background: #28a745;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    .product button:hover {
+      background: #218838;
+    }
+
+    #cart {
+      position: fixed;
+      top: 1em;
+      right: 1em;
+      background: #007bff;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 30px;
+    }
+
+    @media (max-width: 600px) {
+      nav {
+        flex-direction: column;
+        align-items: start;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Mini E-Commerce App</h1>
+</header>
+
+<nav>
+  <div>
+    <label>Filter by Category:</label>
+    <select id="categoryFilter" onchange="applyFilters()">
+      <option value="all">All</option>
+      <option value="electronics">Electronics</option>
+      <option value="books">Books</option>
+    </select>
+  </div>
+  <div>
+    <label>Sort by:</label>
+    <select id="sortBy" onchange="applyFilters()">
+      <option value="price">Price</option>
+      <option value="rating">Rating</option>
+    </select>
+  </div>
+</nav>
+
+<div id="cart">Cart: <span id="cartCount">0</span> items</div>
+
+<main class="container" id="productList"></main>
+
+<footer>
+  <p>&copy; 2025 Mini Shop. Tested on Chrome, Firefox, Safari, and Mobile.</p>
+</footer>
+
+<script>
+  const products = [
+    { id: 1, name: "Smartphone", category: "electronics", price: 599, rating: 4.6 },
+    { id: 2, name: "Laptop", category: "electronics", price: 899, rating: 4.8 },
+    { id: 3, name: "JS Book", category: "books", price: 29, rating: 4.4 },
+    { id: 4, name: "CSS Mastery", category: "books", price: 35, rating: 4.1 },
+  ];
+
+  let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+  function renderProducts(list) {
+    const container = document.getElementById("productList");
+    container.innerHTML = "";
+    list.forEach(p => {
+      const div = document.createElement("div");
+      div.className = "product";
+      div.innerHTML = `
+        <h3>${p.name}</h3>
+        <span>Category: ${p.category}</span><br>
+        <span>Rating: ${p.rating}</span><br>
+        <span>Price: $${p.price}</span><br>
+        <button onclick="addToCart(${p.id})">Add to Cart</button>
+      `;
+      container.appendChild(div);
+    });
+  }
+
+  function addToCart(id) {
+    cart.push(id);
+    localStorage.setItem("cart", JSON.stringify(cart));
+    updateCartCount();
+  }
+
+  function updateCartCount() {
+    document.getElementById("cartCount").innerText = cart.length;
+  }
+
+  function applyFilters() {
+    let filtered = [...products];
+    const category = document.getElementById("categoryFilter").value;
+    const sort = document.getElementById("sortBy").value;
+
+    if (category !== "all") {
+      filtered = filtered.filter(p => p.category === category);
+    }
+
+    if (sort === "price") {
+      filtered.sort((a, b) => a.price - b.price);
+    } else {
+      filtered.sort((a, b) => b.rating - a.rating);
+    }
+
+    renderProducts(filtered);
+  }
+
+  // Init
+  applyFilters();
+  updateCartCount();
+</script>
+
+</body>
+</html>
